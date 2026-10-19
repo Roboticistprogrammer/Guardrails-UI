@@ -1,0 +1,22 @@
+.logo {
+  position: relative;
+  display: inline-block;
+  flex: none;
+  aspect-ratio: 1161 / 954;
+}
+
+.logo-layer {
+  position: absolute;
+  inset: 0;
+  mask-position: center;
+  mask-size: contain;
+  mask-repeat: no-repeat;
+}
+
+.logo-x {
+  background: var(--logo-x);
+}
+
+.logo-d {
+  background: var(--logo-d);
+}

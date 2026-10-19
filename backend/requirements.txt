@@ -1,0 +1,5 @@
+fastapi>=0.115
+uvicorn[standard]>=0.30
+pyyaml>=6.0
+nemoguardrails>=0.24
+langchain-nvidia-ai-endpoints>=1.0

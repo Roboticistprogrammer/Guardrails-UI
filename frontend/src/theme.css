@@ -1,0 +1,81 @@
+@import '../../brand/tokens.css';
+
+/* Maps the raw brand tokens to the active theme. Components use only the
+   semantic names below (--surface-*, --text-*, --border-default, --focus-ring,
+   --color-primary, --color-destructive, --logo-d). See brand/BRAND.md. */
+
+:root {
+  --logo-d: var(--logo-blue);
+  --logo-x: var(--logo-orange);
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --surface-bg: var(--surface-bg-dark);
+    --surface-card: var(--surface-card-dark);
+    --surface-panel: var(--surface-bg-dark);
+    --text-heading: var(--text-heading-dark);
+    --text-body: var(--text-body-dark);
+    --text-muted: var(--text-muted-dark);
+    --border-default: var(--border-default-dark);
+    --focus-ring: var(--focus-ring-dark);
+    --color-primary: var(--color-primary-dark-accent);
+    --color-destructive: var(--color-destructive-dark);
+    --logo-d: var(--fog-100);
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme='dark'] {
+  --surface-bg: var(--surface-bg-dark);
+  --surface-card: var(--surface-card-dark);
+  --surface-panel: var(--surface-bg-dark);
+  --text-heading: var(--text-heading-dark);
+  --text-body: var(--text-body-dark);
+  --text-muted: var(--text-muted-dark);
+  --border-default: var(--border-default-dark);
+  --focus-ring: var(--focus-ring-dark);
+  --color-primary: var(--color-primary-dark-accent);
+  --color-destructive: var(--color-destructive-dark);
+  --logo-d: var(--fog-100);
+  color-scheme: dark;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--surface-panel);
+  color: var(--text-body);
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  color: var(--text-heading);
+  font-family: var(--font-display);
+  font-stretch: var(--font-display-stretch);
+  font-weight: var(--weight-bold);
+  letter-spacing: var(--tracking-tight);
+  line-height: var(--leading-tight);
+}
+
+a {
+  color: var(--color-primary);
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: 2px;
+}
