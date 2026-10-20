@@ -8,7 +8,7 @@ afterEach(() => {
 })
 
 const RESPONSES: Record<string, object> = {
-  '/api/health': { status: 'ok', mode: 'mock' },
+  '/api/connection': { mode: 'mock', topic_control_url: null, nim_ready: null },
   '/api/policy': { content: 'Guidelines for the user messages:' },
 }
 

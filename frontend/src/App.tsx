@@ -1,26 +1,12 @@
-import { useEffect, useState } from 'react'
 import ChatPlayground from './components/ChatPlayground'
+import ConnectionPanel from './components/ConnectionPanel'
 import Logo from './components/Logo'
 import PolicyViewer from './components/PolicyViewer'
 import SamplePromptRunner from './components/SamplePromptRunner'
 import ThemeToggle from './components/ThemeToggle'
 import './App.css'
 
-type Health = { state: 'loading' } | { state: 'ok'; mode: string } | { state: 'error' }
-
 export default function App() {
-  const [health, setHealth] = useState<Health>({ state: 'loading' })
-
-  useEffect(() => {
-    fetch('/api/health')
-      .then((res) => {
-        if (!res.ok) throw new Error(`HTTP ${res.status}`)
-        return res.json() as Promise<{ mode: string }>
-      })
-      .then(({ mode }) => setHealth({ state: 'ok', mode }))
-      .catch(() => setHealth({ state: 'error' }))
-  }, [])
-
   return (
     <div className="app">
       <header className="app-header">
@@ -38,19 +24,9 @@ export default function App() {
           <p className="muted">
             Test how the Llama 3.1 NemoGuard 8B TopicControl rail keeps a conversation on topic.
           </p>
-          <p className="status" role="status">
-            {health.state === 'loading' && 'Connecting to the backend…'}
-            {health.state === 'ok' && (
-              <>
-                Backend connected · model mode <code>{health.mode}</code>
-              </>
-            )}
-            {health.state === 'error' && (
-              <span className="error">Backend unreachable. Start it with scripts/dev.sh.</span>
-            )}
-          </p>
         </section>
 
+        <ConnectionPanel />
         <ChatPlayground />
         <SamplePromptRunner />
         <PolicyViewer />
