@@ -1,6 +1,5 @@
 import ChatPlayground from './components/ChatPlayground'
 import ConnectionPanel from './components/ConnectionPanel'
-import LocalDeployment from './components/LocalDeployment'
 import Logo from './components/Logo'
 import PolicyViewer from './components/PolicyViewer'
 import SamplePromptRunner from './components/SamplePromptRunner'
@@ -31,7 +30,6 @@ export default function App() {
         <ChatPlayground />
         <SamplePromptRunner />
         <PolicyViewer />
-        <LocalDeployment />
       </main>
     </div>
   )

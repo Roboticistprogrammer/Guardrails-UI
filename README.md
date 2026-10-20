@@ -11,7 +11,10 @@ scripts/dev.sh          # http://127.0.0.1:5173, mock mode
 ```
 
 Mock mode needs no API key or GPU. To use real models, copy `.env.example` to
-`.env` and set `GUARDRAILS_MODE` and `NVIDIA_API_KEY`.
+`.env` and set `GUARDRAILS_MODE` and `NVIDIA_API_KEY` (the literal key, not a
+`$VARIABLE`). `hosted` needs no GPU. Because the hosted NemoGuard model is
+currently failing, hosted mode runs Nemotron 3.5 Lightning as the topic check;
+only `local` mode uses the real NemoGuard TopicControl model.
 
 ## Running the TopicControl NIM locally
 

@@ -6,7 +6,7 @@ from nemoguardrails import RailsConfig
 
 from app import rails
 from app.main import app
-from app.rails import REFUSAL, load_config_dict
+from app.rails import LOCAL_TOPIC_CONTROL_MODEL, REFUSAL, THINK_BLOCK, load_config_dict
 
 
 @pytest.fixture
@@ -49,13 +49,16 @@ def test_unknown_mode_fails_startup(monkeypatch):
 
 def test_local_mode_points_topic_control_at_nim():
     models = {m["type"]: m for m in load_config_dict("local", "http://nim:8123/v1")["models"]}
-    assert models["topic_control"]["parameters"]["base_url"] == "http://nim:8123/v1"
-    assert "parameters" not in models["main"]
+    assert models["topic_control"]["model"] == LOCAL_TOPIC_CONTROL_MODEL
+    assert models["topic_control"]["parameters"] == {"base_url": "http://nim:8123/v1"}
+    assert models["main"]["model"] != LOCAL_TOPIC_CONTROL_MODEL
 
 
 def test_hosted_mode_uses_config_unchanged():
     config = load_config_dict("hosted")
-    assert all("parameters" not in m for m in config["models"])
+    no_thinking = {"chat_template_kwargs": {"enable_thinking": False}}
+    assert all(m["parameters"] == no_thinking for m in config["models"])
+    assert all(m["model"] != LOCAL_TOPIC_CONTROL_MODEL for m in config["models"])
     assert config["prompts"][0]["task"] == "topic_safety_check_input $model=topic_control"
 
 
@@ -151,3 +154,16 @@ def test_connection_probes_health_ready(client, nim, monkeypatch, url):
 
 def test_connection_is_read_only(client):
     assert client.post("/api/connection").status_code == 405
+
+
+@pytest.mark.parametrize(
+    ("raw", "clean"),
+    [
+        ("<think>pondering</think>\n\nA drone battery powers flight.", "A drone battery powers flight."),
+        ("<think>line 1\nline 2</think>Answer", "Answer"),
+        ("<think>cut off by the token limit", ""),
+        ("No reasoning here.", "No reasoning here."),
+    ],
+)
+def test_reasoning_is_stripped_from_replies(raw, clean):
+    assert THINK_BLOCK.sub("", raw).strip() == clean

@@ -12,7 +12,9 @@ import yaml
 CONFIG_DIR = Path(__file__).resolve().parent.parent / "guardrails_config"
 MODES = ("mock", "hosted", "local")
 DEFAULT_LOCAL_URL = "http://localhost:8123/v1"
+LOCAL_TOPIC_CONTROL_MODEL = "nvidia/llama-3.1-nemoguard-8b-topic-control"
 REFUSAL = "I'm sorry, I can't respond to that."
+THINK_BLOCK = re.compile(r"<think>.*?(?:</think>|$)\s*", re.DOTALL)
 
 # Stand-in for the topic-control model in mock mode: the sensitive topics the
 # default prompts.yml tells the model to refuse.
@@ -45,12 +47,13 @@ class MockRails:
 
 
 def load_config_dict(mode: str, local_url: str = DEFAULT_LOCAL_URL) -> dict:
-    """config.yml and prompts.yml merged; in local mode topic_control points at the local NIM."""
+    """config.yml and prompts.yml merged; in local mode topic_control is the NemoGuard NIM at local_url."""
     config = yaml.safe_load((CONFIG_DIR / "config.yml").read_text())
     config.update(yaml.safe_load((CONFIG_DIR / "prompts.yml").read_text()))
     if mode == "local":
         for model in config["models"]:
             if model["type"] == "topic_control":
+                model["model"] = LOCAL_TOPIC_CONTROL_MODEL
                 model["parameters"] = {"base_url": local_url}
     return config
 
@@ -76,7 +79,8 @@ class NemoRails:
             messages=messages, options={"log": {"activated_rails": True}}
         )
         blocked = any(rail.type == "input" and rail.stop for rail in response.log.activated_rails)
-        return ChatResult(content=response.response[-1]["content"], blocked=blocked)
+        content = THINK_BLOCK.sub("", response.response[-1]["content"]).strip()
+        return ChatResult(content=content, blocked=blocked)
 
 
 def topic_control_url() -> str:

@@ -17,7 +17,7 @@ frontend/                    React 19 + TypeScript + Vite
   src/theme.css              maps brand tokens to light/dark; global element styles
   src/theme.ts               stored light/dark choice; applied before render
   src/samplePrompts.ts       example prompts and expected outcomes for the runner
-  src/components/            shared components (Logo.tsx, ChatPlayground.tsx, ThemeToggle.tsx, SamplePromptRunner.tsx, PolicyViewer.tsx, ConnectionPanel.tsx, LocalDeployment.tsx)
+  src/components/            shared components (Logo.tsx, ChatPlayground.tsx, ThemeToggle.tsx, SamplePromptRunner.tsx, PolicyViewer.tsx, ConnectionPanel.tsx)
 brand/                       DroneX brand: tokens.css, logo masks, BRAND.md
 scripts/                     setup.sh, dev.sh, check.sh
 factory/                     software factory backlog and dashboard (see below)
@@ -70,12 +70,15 @@ Set by `GUARDRAILS_MODE` (from the environment or `.env`; see `.env.example`):
   and all factory agents use mock mode. Never require a key or a GPU to test.
   The sample prompts in `frontend/src/samplePrompts.ts` are chosen so that all
   pass in mock mode, so keep them in step with `MOCK_OFF_TOPIC`.
-- `hosted`: both models on build.nvidia.com. Needs `NVIDIA_API_KEY`.
-- `local`: topic control from the local NIM container at `TOPIC_CONTROL_URL`
-  (default `http://localhost:8123/v1`); the main model stays hosted. The
-  Local deployment section in the UI shows the README's NIM commands with copy
-  buttons; keep the commands in `LocalDeployment.tsx` in step with that README
-  block.
+- `hosted`: both models on build.nvidia.com. Needs `NVIDIA_API_KEY`. The hosted
+  NemoGuard topic-control model crashes (HTTP 500) and the old main model is
+  retired, so `config.yml` uses `nvidia/nemotron-3.5-lightning-30b-a3b` for both
+  roles with thinking off (`chat_template_kwargs`; a reasoning reply would not
+  parse as `off-topic`/`on-topic`).
+- `local`: topic control from the local NemoGuard NIM container at
+  `TOPIC_CONTROL_URL` (default `http://localhost:8123/v1`); `load_config_dict`
+  swaps the model name and drops the hosted parameters. The main model stays
+  hosted.
 
 `GET /api/connection` reports the mode and, in local mode only, the
 `TOPIC_CONTROL_URL` and whether the NIM answers `/v1/health/ready` with 200.
