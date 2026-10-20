@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import ChatPlayground from './components/ChatPlayground'
 import Logo from './components/Logo'
+import ThemeToggle from './components/ThemeToggle'
 import './App.css'
 
 type Health = { state: 'loading' } | { state: 'ok'; mode: string } | { state: 'error' }
@@ -26,6 +27,7 @@ export default function App() {
           <span className="eyebrow">DroneX / Guardrails</span>
           <h1>Topic control</h1>
         </div>
+        <ThemeToggle />
       </header>
 
       <main className="app-main">
