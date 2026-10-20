@@ -13,7 +13,7 @@ const DOCKER_RUN = `docker run -d --name llama-nemotron-topic-guard \\
   --gpus=all --runtime=nvidia --shm-size=64GB \\
   -e NGC_API_KEY -u "$(id -u)" \\
   -v "$LOCAL_NIM_CACHE:/opt/nim/.cache/" \\
-  -p 8123:8000 \\
+  -p 127.0.0.1:8123:8000 \\
   nvcr.io/nim/nvidia/llama-3.1-nemoguard-8b-topic-control:1.10.1`
 
 const STEPS = [
