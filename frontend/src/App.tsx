@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import ChatPlayground from './components/ChatPlayground'
 import Logo from './components/Logo'
 import './App.css'
 
@@ -45,6 +46,8 @@ export default function App() {
             )}
           </p>
         </section>
+
+        <ChatPlayground />
       </main>
     </div>
   )

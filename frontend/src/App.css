@@ -24,6 +24,12 @@
   font-size: var(--text-3xl);
 }
 
+.app-main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
 .eyebrow {
   font-family: var(--font-mono);
   font-size: var(--text-xs);
