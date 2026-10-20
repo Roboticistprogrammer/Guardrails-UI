@@ -14,7 +14,8 @@ backend/                     FastAPI + nemoguardrails (Python 3.12)
   tests/                     pytest
 frontend/                    React 19 + TypeScript + Vite
   src/theme.css              maps brand tokens to light/dark; global element styles
-  src/components/            shared components (Logo.tsx, ChatPlayground.tsx)
+  src/theme.ts               stored light/dark choice; applied before render
+  src/components/            shared components (Logo.tsx, ChatPlayground.tsx, ThemeToggle.tsx)
 brand/                       DroneX brand: tokens.css, logo masks, BRAND.md
 scripts/                     setup.sh, dev.sh, check.sh
 factory/                     software factory backlog and dashboard (see below)
@@ -76,7 +77,8 @@ Never commit `.env` or any key. Don't call real NVIDIA endpoints from tests.
 - **Brand:** any UI change follows `brand/BRAND.md`. Use only the semantic CSS
   variables from `src/theme.css` and the token scales from `brand/tokens.css`;
   no hard-coded colours, sizes or fonts. Every screen works in light and dark
-  and at 360 px wide.
+  and at 360 px wide. The header switch sets `data-theme` on `<html>` and
+  stores it in `localStorage` (`guardrails-ui-theme`).
 - **Frontend:** function components and hooks, no UI library. Co-locate a
   component's CSS as `Name.css` next to `Name.tsx`. Single quotes, no
   semicolons (match existing files). Every user-visible state (loading, empty,
