@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import ChatPlayground from './components/ChatPlayground'
 import Logo from './components/Logo'
+import SamplePromptRunner from './components/SamplePromptRunner'
 import ThemeToggle from './components/ThemeToggle'
 import './App.css'
 
@@ -50,6 +51,7 @@ export default function App() {
         </section>
 
         <ChatPlayground />
+        <SamplePromptRunner />
       </main>
     </div>
   )

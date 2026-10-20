@@ -15,7 +15,8 @@ backend/                     FastAPI + nemoguardrails (Python 3.12)
 frontend/                    React 19 + TypeScript + Vite
   src/theme.css              maps brand tokens to light/dark; global element styles
   src/theme.ts               stored light/dark choice; applied before render
-  src/components/            shared components (Logo.tsx, ChatPlayground.tsx, ThemeToggle.tsx)
+  src/samplePrompts.ts       example prompts and expected outcomes for the runner
+  src/components/            shared components (Logo.tsx, ChatPlayground.tsx, ThemeToggle.tsx, SamplePromptRunner.tsx)
 brand/                       DroneX brand: tokens.css, logo masks, BRAND.md
 scripts/                     setup.sh, dev.sh, check.sh
 factory/                     software factory backlog and dashboard (see below)
@@ -66,6 +67,8 @@ Set by `GUARDRAILS_MODE` (from the environment or `.env`; see `.env.example`):
 - `mock` (default): no network, no keys. A keyword check stands in for the
   topic-control model, and on-topic replies are `[mock] ...` echoes. All tests
   and all factory agents use mock mode. Never require a key or a GPU to test.
+  The sample prompts in `frontend/src/samplePrompts.ts` are chosen so that all
+  pass in mock mode, so keep them in step with `MOCK_OFF_TOPIC`.
 - `hosted`: both models on build.nvidia.com. Needs `NVIDIA_API_KEY`.
 - `local`: topic control from the local NIM container at `TOPIC_CONTROL_URL`
   (default `http://localhost:8123/v1`); the main model stays hosted.
