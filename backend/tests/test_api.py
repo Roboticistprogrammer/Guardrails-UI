@@ -1,3 +1,4 @@
+import httpx
 import pytest
 import yaml
 from fastapi.testclient import TestClient
@@ -83,3 +84,70 @@ def test_policy_is_empty_without_topic_control_prompt(client, monkeypatch, tmp_p
     res = client.get("/api/policy")
     assert res.status_code == 200
     assert res.json() == {"content": ""}
+
+
+@pytest.fixture
+def nim(client, monkeypatch):
+    """Local mode with the NIM's HTTP layer stubbed; set `respond` to control the answer."""
+    monkeypatch.setattr(client.app.state.rails, "mode", "local")
+    monkeypatch.setenv("TOPIC_CONTROL_URL", "http://nim.test:8123/v1")
+    stub = {"respond": lambda request: httpx.Response(200), "requests": []}
+
+    def handler(request):
+        stub["requests"].append(request)
+        return stub["respond"](request)
+
+    real_client = httpx.AsyncClient
+    monkeypatch.setattr(
+        httpx, "AsyncClient", lambda **kwargs: real_client(transport=httpx.MockTransport(handler), **kwargs)
+    )
+    return stub
+
+
+def test_connection_in_mock_mode_skips_nim(client):
+    res = client.get("/api/connection")
+    assert res.status_code == 200
+    assert res.json() == {"mode": "mock", "topic_control_url": None, "nim_ready": None}
+
+
+def test_connection_in_hosted_mode_skips_nim(client, nim, monkeypatch):
+    monkeypatch.setattr(client.app.state.rails, "mode", "hosted")
+    res = client.get("/api/connection")
+    assert res.json() == {"mode": "hosted", "topic_control_url": None, "nim_ready": None}
+    assert nim["requests"] == []
+
+
+def test_connection_reports_ready_nim(client, nim):
+    res = client.get("/api/connection")
+    assert res.status_code == 200
+    assert res.json() == {"mode": "local", "topic_control_url": "http://nim.test:8123/v1", "nim_ready": True}
+
+
+def test_connection_reports_nim_not_ready(client, nim):
+    nim["respond"] = lambda request: httpx.Response(503)
+    res = client.get("/api/connection")
+    assert res.status_code == 200
+    assert res.json() == {"mode": "local", "topic_control_url": "http://nim.test:8123/v1", "nim_ready": False}
+
+
+def test_connection_reports_unreachable_nim(client, nim):
+    def refuse(request):
+        raise httpx.ConnectError("Connection refused", request=request)
+
+    nim["respond"] = refuse
+    res = client.get("/api/connection")
+    assert res.status_code == 200
+    assert res.json()["nim_ready"] is False
+
+
+@pytest.mark.parametrize("url", ["http://nim.test:8123/v1", "http://nim.test:8123/v1/"])
+def test_connection_probes_health_ready(client, nim, monkeypatch, url):
+    monkeypatch.setenv("TOPIC_CONTROL_URL", url)
+    assert client.get("/api/connection").json()["topic_control_url"] == url
+    assert [(r.method, str(r.url)) for r in nim["requests"]] == [
+        ("GET", "http://nim.test:8123/v1/health/ready")
+    ]
+
+
+def test_connection_is_read_only(client):
+    assert client.post("/api/connection").status_code == 405

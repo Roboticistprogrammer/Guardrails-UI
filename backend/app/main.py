@@ -4,7 +4,7 @@ from typing import Literal
 from fastapi import FastAPI, Request
 from pydantic import BaseModel, Field
 
-from app.rails import create_rails, load_topic_policy
+from app.rails import check_nim_ready, create_rails, load_topic_policy, topic_control_url
 
 
 @asynccontextmanager
@@ -34,9 +34,24 @@ class PolicyResponse(BaseModel):
     content: str
 
 
+class ConnectionResponse(BaseModel):
+    mode: str
+    topic_control_url: str | None
+    nim_ready: bool | None
+
+
 @app.get("/api/health")
 async def health(request: Request) -> dict[str, str]:
     return {"status": "ok", "mode": request.app.state.rails.mode}
+
+
+@app.get("/api/connection")
+async def connection(request: Request) -> ConnectionResponse:
+    mode = request.app.state.rails.mode
+    if mode != "local":
+        return ConnectionResponse(mode=mode, topic_control_url=None, nim_ready=None)
+    url = topic_control_url()
+    return ConnectionResponse(mode=mode, topic_control_url=url, nim_ready=await check_nim_ready(url))
 
 
 @app.post("/api/chat")
