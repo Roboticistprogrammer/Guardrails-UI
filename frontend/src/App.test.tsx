@@ -21,6 +21,7 @@ test('shows the model mode once the backend answers', async () => {
   expect(await screen.findByText('mock')).toBeInTheDocument()
   expect(screen.getByRole('img', { name: 'DroneX' })).toBeInTheDocument()
   expect(await screen.findByText('Guidelines for the user messages:')).toBeInTheDocument()
+  expect(screen.getByRole('heading', { name: 'Local deployment' })).toBeInTheDocument()
 })
 
 test('says so when the backend is unreachable', async () => {
