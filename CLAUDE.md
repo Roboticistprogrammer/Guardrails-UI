@@ -17,7 +17,7 @@ frontend/                    React 19 + TypeScript + Vite
   src/theme.css              maps brand tokens to light/dark; global element styles
   src/theme.ts               stored light/dark choice; applied before render
   src/samplePrompts.ts       example prompts and expected outcomes for the runner
-  src/components/            shared components (Logo.tsx, ChatPlayground.tsx, ThemeToggle.tsx, SamplePromptRunner.tsx, PolicyViewer.tsx)
+  src/components/            shared components (Logo.tsx, ChatPlayground.tsx, ThemeToggle.tsx, SamplePromptRunner.tsx, PolicyViewer.tsx, ConnectionPanel.tsx)
 brand/                       DroneX brand: tokens.css, logo masks, BRAND.md
 scripts/                     setup.sh, dev.sh, check.sh
 factory/                     software factory backlog and dashboard (see below)
@@ -73,6 +73,10 @@ Set by `GUARDRAILS_MODE` (from the environment or `.env`; see `.env.example`):
 - `hosted`: both models on build.nvidia.com. Needs `NVIDIA_API_KEY`.
 - `local`: topic control from the local NIM container at `TOPIC_CONTROL_URL`
   (default `http://localhost:8123/v1`); the main model stays hosted.
+
+`GET /api/connection` reports the mode and, in local mode only, the
+`TOPIC_CONTROL_URL` and whether the NIM answers `/v1/health/ready` with 200.
+The connection panel in the UI shows it.
 
 Never commit `.env` or any key. Don't call real NVIDIA endpoints from tests.
 
