@@ -10,13 +10,14 @@ the frontend is where people test and tune the topic rail.
 backend/                     FastAPI + nemoguardrails (Python 3.12)
   app/main.py                HTTP API, all routes under /api
   app/rails.py               the rails in three modes: mock, hosted, local
-  guardrails_config/         NeMo Guardrails config.yml + prompts.yml (the topic policy)
+  guardrails_config/         NeMo Guardrails config.yml + prompts.yml (the topic policy;
+                             GET /api/policy serves the topic-control prompt read-only)
   tests/                     pytest
 frontend/                    React 19 + TypeScript + Vite
   src/theme.css              maps brand tokens to light/dark; global element styles
   src/theme.ts               stored light/dark choice; applied before render
   src/samplePrompts.ts       example prompts and expected outcomes for the runner
-  src/components/            shared components (Logo.tsx, ChatPlayground.tsx, ThemeToggle.tsx, SamplePromptRunner.tsx)
+  src/components/            shared components (Logo.tsx, ChatPlayground.tsx, ThemeToggle.tsx, SamplePromptRunner.tsx, PolicyViewer.tsx)
 brand/                       DroneX brand: tokens.css, logo masks, BRAND.md
 scripts/                     setup.sh, dev.sh, check.sh
 factory/                     software factory backlog and dashboard (see below)
