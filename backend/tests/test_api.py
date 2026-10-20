@@ -1,7 +1,9 @@
 import pytest
+import yaml
 from fastapi.testclient import TestClient
 from nemoguardrails import RailsConfig
 
+from app import rails
 from app.main import app
 from app.rails import REFUSAL, load_config_dict
 
@@ -59,3 +61,25 @@ def test_hosted_mode_uses_config_unchanged():
 @pytest.mark.parametrize("mode", ["hosted", "local"])
 def test_config_is_valid_for_nemoguardrails(mode):
     RailsConfig.from_content(config=load_config_dict(mode))
+
+
+def test_policy_returns_topic_control_prompt(client):
+    prompts = yaml.safe_load((rails.CONFIG_DIR / "prompts.yml").read_text())["prompts"]
+    expected = next(
+        p["content"] for p in prompts if p["task"] == "topic_safety_check_input $model=topic_control"
+    )
+    res = client.get("/api/policy")
+    assert res.status_code == 200
+    assert res.json() == {"content": expected}
+
+
+def test_policy_is_read_only(client):
+    assert client.post("/api/policy").status_code == 405
+
+
+def test_policy_is_empty_without_topic_control_prompt(client, monkeypatch, tmp_path):
+    (tmp_path / "prompts.yml").write_text("prompts:\n  - task: other\n    content: Not the policy.\n")
+    monkeypatch.setattr(rails, "CONFIG_DIR", tmp_path)
+    res = client.get("/api/policy")
+    assert res.status_code == 200
+    assert res.json() == {"content": ""}

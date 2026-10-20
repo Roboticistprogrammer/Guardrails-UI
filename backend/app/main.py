@@ -4,7 +4,7 @@ from typing import Literal
 from fastapi import FastAPI, Request
 from pydantic import BaseModel, Field
 
-from app.rails import create_rails
+from app.rails import create_rails, load_topic_policy
 
 
 @asynccontextmanager
@@ -30,6 +30,10 @@ class ChatResponse(BaseModel):
     blocked: bool
 
 
+class PolicyResponse(BaseModel):
+    content: str
+
+
 @app.get("/api/health")
 async def health(request: Request) -> dict[str, str]:
     return {"status": "ok", "mode": request.app.state.rails.mode}
@@ -39,3 +43,8 @@ async def health(request: Request) -> dict[str, str]:
 async def chat(body: ChatRequest, request: Request) -> ChatResponse:
     result = await request.app.state.rails.chat([m.model_dump() for m in body.messages])
     return ChatResponse(content=result.content, blocked=result.blocked)
+
+
+@app.get("/api/policy")
+def policy() -> PolicyResponse:
+    return PolicyResponse(content=load_topic_policy())

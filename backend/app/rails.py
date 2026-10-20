@@ -54,6 +54,15 @@ def load_config_dict(mode: str, local_url: str = DEFAULT_LOCAL_URL) -> dict:
     return config
 
 
+def load_topic_policy() -> str:
+    """The topic-control prompt's content from prompts.yml, or "" if there is none."""
+    prompts = yaml.safe_load((CONFIG_DIR / "prompts.yml").read_text()).get("prompts", [])
+    for prompt in prompts:
+        if prompt.get("task") == "topic_safety_check_input $model=topic_control":
+            return prompt["content"]
+    return ""
+
+
 class NemoRails:
     def __init__(self, mode: str, local_url: str = DEFAULT_LOCAL_URL):
         from nemoguardrails import LLMRails, RailsConfig
