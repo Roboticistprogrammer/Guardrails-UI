@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Protocol
 
+import httpx
 import yaml
 
 CONFIG_DIR = Path(__file__).resolve().parent.parent / "guardrails_config"
@@ -78,10 +79,24 @@ class NemoRails:
         return ChatResult(content=response.response[-1]["content"], blocked=blocked)
 
 
+def topic_control_url() -> str:
+    return os.environ.get("TOPIC_CONTROL_URL", DEFAULT_LOCAL_URL)
+
+
+async def check_nim_ready(base_url: str) -> bool:
+    """True only if the NIM answers 200 on <base_url>/health/ready."""
+    try:
+        async with httpx.AsyncClient(timeout=2.0) as client:
+            response = await client.get(base_url.rstrip("/") + "/health/ready")
+    except httpx.HTTPError:
+        return False
+    return response.status_code == 200
+
+
 def create_rails() -> Rails:
     mode = os.environ.get("GUARDRAILS_MODE", "mock")
     if mode not in MODES:
         raise ValueError(f"GUARDRAILS_MODE must be one of {MODES}, got {mode!r}")
     if mode == "mock":
         return MockRails()
-    return NemoRails(mode, os.environ.get("TOPIC_CONTROL_URL", DEFAULT_LOCAL_URL))
+    return NemoRails(mode, topic_control_url())
