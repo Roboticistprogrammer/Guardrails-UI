@@ -14,7 +14,7 @@ backend/                     FastAPI + nemoguardrails (Python 3.12)
   tests/                     pytest
 frontend/                    React 19 + TypeScript + Vite
   src/theme.css              maps brand tokens to light/dark; global element styles
-  src/components/            shared components (Logo.tsx)
+  src/components/            shared components (Logo.tsx, ChatPlayground.tsx)
 brand/                       DroneX brand: tokens.css, logo masks, BRAND.md
 scripts/                     setup.sh, dev.sh, check.sh
 factory/                     software factory backlog and dashboard (see below)
