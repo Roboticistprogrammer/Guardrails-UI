@@ -174,3 +174,30 @@ test('does not send whitespace-only text', () => {
   fireEvent.submit(input.closest('form')!)
   expect(fetchMock).not.toHaveBeenCalled()
 })
+
+test('keeps focus in the textarea after sending with the Send button', async () => {
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(reply('[mock] On topic. You said: Hi', false)))
+  render(<ChatPlayground />)
+  fireEvent.change(screen.getByLabelText('Message'), { target: { value: 'Hi' } })
+  const button = screen.getByRole('button', { name: 'Send' })
+  button.focus()
+  fireEvent.click(button)
+  expect(screen.getByLabelText('Message')).toHaveFocus()
+  await screen.findByText('[mock] On topic. You said: Hi')
+  expect(screen.getByLabelText('Message')).toHaveFocus()
+})
+
+test('moves focus back to the restored text when the request fails', async () => {
+  let fail: (reason: unknown) => void = () => {}
+  vi.stubGlobal('fetch', vi.fn().mockReturnValue(new Promise((_resolve, reject) => (fail = reject))))
+  render(<ChatPlayground />)
+  send('Retry me')
+  const input = screen.getByLabelText('Message')
+  input.blur()
+  expect(input).not.toHaveFocus()
+
+  fail(new TypeError('Failed to fetch'))
+  await screen.findByRole('alert')
+  expect(input).toHaveValue('Retry me')
+  expect(input).toHaveFocus()
+})

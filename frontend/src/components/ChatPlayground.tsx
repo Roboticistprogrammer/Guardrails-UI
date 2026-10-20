@@ -1,4 +1,4 @@
-import { useId, useState, type FormEvent, type KeyboardEvent } from 'react'
+import { useId, useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
 import './ChatPlayground.css'
 
 type Message =
@@ -14,6 +14,7 @@ export default function ChatPlayground() {
   const [pending, setPending] = useState(false)
   const [failed, setFailed] = useState(false)
   const inputId = useId()
+  const inputRef = useRef<HTMLTextAreaElement>(null)
 
   const text = draft.trim()
   const canSend = text !== '' && !pending
@@ -25,6 +26,8 @@ export default function ChatPlayground() {
     setMessages(history)
     setDraft('')
     setPending(true)
+    // Send becomes disabled once the draft clears, which would drop its focus.
+    inputRef.current?.focus()
 
     fetch('/api/chat', {
       method: 'POST',
@@ -45,6 +48,7 @@ export default function ChatPlayground() {
         setMessages(previous)
         setDraft(text)
         setFailed(true)
+        inputRef.current?.focus()
       })
       .finally(() => setPending(false))
   }
@@ -92,6 +96,7 @@ export default function ChatPlayground() {
         </label>
         <textarea
           id={inputId}
+          ref={inputRef}
           className="chat-input"
           rows={3}
           maxLength={4000}
