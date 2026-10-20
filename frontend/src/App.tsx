@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import ChatPlayground from './components/ChatPlayground'
 import Logo from './components/Logo'
+import PolicyViewer from './components/PolicyViewer'
 import SamplePromptRunner from './components/SamplePromptRunner'
 import ThemeToggle from './components/ThemeToggle'
 import './App.css'
@@ -52,6 +53,7 @@ export default function App() {
 
         <ChatPlayground />
         <SamplePromptRunner />
+        <PolicyViewer />
       </main>
     </div>
   )
